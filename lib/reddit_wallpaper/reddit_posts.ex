@@ -1,5 +1,6 @@
 defmodule RedditWallpaper.RedditPosts do
   require Logger
+  alias Poison, as: JSON
   @user_agent [{"User-agent", "Elixir wallpaper fetcher"}]
   @wallpaper_url Application.get_env(:RedditWallpaper, :wallpaper_url)
   
@@ -14,7 +15,7 @@ defmodule RedditWallpaper.RedditPosts do
     "#{@wallpaper_url}/#{queue}.json"
   end
   
-  def handle_response(%{status_code: 200, body: body}), do: {:ok, :jsx.decode(body)}
+  def handle_response(%{status_code: 200, body: body}), do: {:ok, JSON.decode!(body)}
   def handle_response(%{status_code: ___, body: body}), do: {:error, body}
     
 end  

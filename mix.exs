@@ -13,7 +13,7 @@ defmodule RedditWallpaper.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :httpoison, :jsx]]
+    [applications: [:logger, :httpoison, :poison]]
   end
 
   # Dependencies can be Hex packages:
@@ -28,7 +28,7 @@ defmodule RedditWallpaper.Mixfile do
   defp deps do
     [
       {:httpoison, "~> 0.4.2"},
-      {:jsx,       "~> 2.0"}
+      {:poison,    github: "devinus/poison"}
     ]
   end
   

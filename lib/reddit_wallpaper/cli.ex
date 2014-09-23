@@ -21,10 +21,10 @@ defmodule RedditWallpaper.CLI do
   def parse_args(argv) do
     parse = OptionParser.parse(argv, switches: [help: :boolean],
                                      alieases: [h: :help])
-    
+
     case parse do
       { [help: true], _ } -> :help
-      { _, [queue] } -> queue
+      { _, queue, _ } -> queue
       _ -> "hot"
     end
   end
@@ -47,7 +47,7 @@ defmodule RedditWallpaper.CLI do
     RedditWallpaper.RedditPosts.fetch(queue)
     |> decode_response
     |> get_posts
-    |> get_random_url
+    #|> get_random_url
 
   end
 
@@ -58,11 +58,8 @@ defmodule RedditWallpaper.CLI do
   end
   
   def get_posts(response) do
-    response
-    |> Enum.fetch!(1)
-    |> elem(1)
-    |> Enum.fetch!(1)
-    |> elem(1)
+    response["data"]["children"]
+    |> Enum.map &(&1["data"]["url"])
   end
 
   def get_random_url(posts) do
@@ -78,12 +75,5 @@ defmodule RedditWallpaper.CLI do
     |> elem(1)
     |> Enum.filter(fn(t) -> elem(t, 0) == "url" end)
   end
-    
-  #def convert_to_list_of_urls([reddit_posts]) do
-  #  reddit_posts["data"]
-  #  |> Enum.at 0
-  #  |> 
-  #  |> Enum.map &(&1["data"]["children"])
-  #  |>
-  #end
+
 end
