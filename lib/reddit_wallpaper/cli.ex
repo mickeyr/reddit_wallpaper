@@ -46,9 +46,11 @@ defmodule RedditWallpaper.CLI do
   def process(queue) do
     RedditWallpaper.RedditPosts.fetch(queue)
     |> decode_response
-    |> get_posts
-    #|> get_random_url
-
+    |> get_urls
+    |> Enum.filter(&(String.ends_with? &1, "jpg"))
+    |> Enum.shuffle
+    |> Enum.take(1)
+    |> download_image
   end
 
   def decode_response({:ok, body}), do: body
@@ -57,9 +59,13 @@ defmodule RedditWallpaper.CLI do
     System.halt(2)
   end
   
-  def get_posts(response) do
+  def get_urls(response) do
     response["data"]["children"]
     |> Enum.map &(&1["data"]["url"])
+  end
+
+  def is_link_to_image(url) do
+    
   end
 
   def get_random_url(posts) do
@@ -68,12 +74,16 @@ defmodule RedditWallpaper.CLI do
     |> Enum.shuffle
     |> Enum.take(1)
   end
-    
-  def get_urls(post) do
-    post
-    |> Enum.fetch!(1)
-    |> elem(1)
-    |> Enum.filter(fn(t) -> elem(t, 0) == "url" end)
+
+  def download_image([image]) do
+    Logger.info "Downloading " <> image
+    image
+    |> HTTPoison.get
+    |> handle_response
   end
 
+  def handle_response(%{status_code: 200, body: body}) do
+    File.write!("wallpaper.jpg", body)
+  end
+  def handle_response(%{status_code: ___, body: body}), do: {:error, body}
 end
